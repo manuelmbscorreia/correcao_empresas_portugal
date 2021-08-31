@@ -6,14 +6,55 @@ dfEn = pd.read_excel("Base_de_Dados_Empresas_Entidades.xlsx", sheet_name='Entida
 dfPol = pd.read_excel("Base_de_Dados_Empresas_Entidades.xlsx", sheet_name='Politécnicos e Universidades')
 dfMun = pd.read_excel("Base_de_Dados_Empresas_Entidades.xlsx", sheet_name='Municipios')
 
+# Remover Nan's
+for x in dfEm.columns:
+    x = str(x)
+    dfEm[x] = dfEm[x].fillna("")
+
+for x in dfEn.columns:
+    x = str(x)
+    dfEn[x] = dfEn[x].fillna("")
+
+for x in dfMun.columns:
+    x = str(x)
+    dfMun[x] = dfMun[x].fillna("")
+
+for x in dfPol.columns:
+    x = str(x)
+    dfPol[x] = dfPol[x].fillna("")
+
 # Retirar espaço em branco antes e depois das str
-dfEm.Localidade = dfEm.Localidade.str.strip()
-dfEn.columns = dfEn.columns.str.strip()
-dfPol.columns = dfPol.columns.str.strip()
-dfMun.columns = dfMun.columns.str.strip()
+for x in dfEm.columns:
+    if dfEm[x].dtypes == str:
+        x = str(x)
+        dfEm[x] = dfEm[x].str.strip()
+    if dfEm[x].dtypes == object:
+        x = str(x)
+        dfEm[x] = dfEm[x].astype(str).replace('\.0', '', regex=True)
 
-# Tirar NAN dos E-mails
+for x in dfEn.columns:
+    if dfEn[x].dtypes == str:
+        x = str(x)
+        dfEn[x] = dfEn[x].str.strip()
+    if dfEn[x].dtypes == object:
+        x = str(x)
+        dfEn[x] = dfEn[x].astype(str).replace('\.0', '', regex=True)
 
+for x in dfMun.columns:
+    if dfMun[x].dtypes == str:
+        x = str(x)
+        dfMun[x] = dfMun[x].str.strip()
+    if dfMun[x].dtypes == object:
+        x = str(x)
+        dfMun[x] = dfMun[x].astype(str).replace('\.0', '', regex=True)
+
+for x in dfPol.columns:
+    if dfPol[x].dtypes == str:
+        x = str(x)
+        dfPol[x] = dfPol[x].str.strip()
+    if dfPol[x].dtypes == object:
+        x = str(x)
+        dfPol[x] = dfPol[x].astype(str).replace('\.0', '', regex=True)
 
 # Normalizar e tirar acentos
 dfEm["Localidade"] = dfEm["Localidade"].str.normalize('NFKD').str.encode('ascii', errors='ignore').str.decode('utf-8')
@@ -48,6 +89,16 @@ dfloc["Municipio"] = dfloc["Municipio"].str.lower()
 # Criar Listas para itenerar
 dfEmMun = dfEm.Localidade.values.tolist()
 dfEmDist = dfEm.Localidade.values.tolist()
+
+dfEnMun = dfEn.Localidade.values.tolist()
+dfEnDist = dfEn.Localidade.values.tolist()
+
+dfPolMun = dfPol.Localidade.values.tolist()
+dfPolDist = dfPol.Localidade.values.tolist()
+
+dfMunDist = dfMun.Localidade.values.tolist()
+dfMunMun = dfMun.Localidade.values.tolist()
+
 dfloclist = dfloc.values.tolist()
 
 # Corrigir uns valores da Lista de Municipios
@@ -92,10 +143,39 @@ for x in range(len(dfEmMun)):
 for x in range(len(dfEmDist)):
     dfEmDist[x] = pesquisa_distrito(dfEmDist[x])
 
+for x in range(len(dfEnMun)):
+    dfEnMun[x] = pesquisa_municipios(dfEnMun[x])
+
+for x in range(len(dfEnDist)):
+    dfEnDist[x] = pesquisa_distrito(dfEnDist[x])
+
+for x in range(len(dfPolMun)):
+    dfPolMun[x] = pesquisa_municipios(dfPolMun[x])
+
+for x in range(len(dfPolDist)):
+    dfPolDist[x] = pesquisa_distrito(dfPolDist[x])
+
+for x in range(len(dfMunMun)):
+    dfMunMun[x] = pesquisa_municipios(dfMunMun[x])
+
+for x in range(len(dfMunDist)):
+    dfMunDist[x] = pesquisa_distrito(dfMunDist[x])
+
 # Passar listas para o DF original
 dfEm["Distrito"] = dfEmDist
 dfEm["Municipio"] = dfEmMun
 
-# REMOVER NAN's no FINAL
-print("Len dfloc = " + str(len(dfloc["Municipio"])))
-print("Len dfEm = " + str(len(dfEm["Localidade"])))
+dfEn["Distrito"] = dfEnDist
+dfEn["Municipio"] = dfEnMun
+
+dfPol["Distrito"] = dfPolDist
+dfPol["Municipio"] = dfPolMun
+
+dfMun["Distrito"] = dfMunDist
+dfMun["Municipio"] = dfMunMun
+
+# Save Excels
+dfEm.to_excel("dfEm.xlsx")
+dfEn.to_excel("dfEn.xlsx")
+dfMun.to_excel("dfPol.xlsx")
+dfPol.to_excel("dfMun.xlsx")
